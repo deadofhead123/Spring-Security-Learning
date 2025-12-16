@@ -5,6 +5,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
+    @GetMapping("")
+    public String defaultMethod(){
+        return "Hello";
+    }
+
     @GetMapping("/admin")
     public String adminMethod(){
         return "This is admin method";

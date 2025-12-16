@@ -33,7 +33,7 @@ public class SecurityConfig {
 //                        .logoutUrl("/logout")
 //                        .permitAll()           // Cấu hình logout
 //                )
-                .httpBasic()
+                .httpBasic() // Sử dụng basicAuth để login trong postman
         ;
 
         return http.build();

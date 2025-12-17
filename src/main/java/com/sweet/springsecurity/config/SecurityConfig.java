@@ -9,8 +9,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -24,6 +24,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Vô hiệu hóa CSRF (cho demo)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll() // allow login, register
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Chỉ ADMIN vào được khu vực quản trị
                         .requestMatchers("/user/**").hasRole("USER")   // USER vào được khu vực chung
                         .anyRequest().authenticated()                  // Các yêu cầu khác đều phải xác thực
@@ -49,7 +50,14 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Mã hóa mật khẩu bằng BCrypt
+//        return new BCryptPasswordEncoder(); // Mã hóa mật khẩu bằng BCrypt
+        return new SCryptPasswordEncoder( // Mã hóa mật khẩu bằng SCrypt
+                16384, // cpu Cost
+                8,     // memory Cost
+                1,     // parallelization
+                32,    // key length
+                32     // salt length
+        );
     }
 
 //    @Bean

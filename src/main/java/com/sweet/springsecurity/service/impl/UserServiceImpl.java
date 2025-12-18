@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
             throw new LockedException("Account is locked");
 
         } catch (Exception e) {
-            throw new Exception("An error occurred during authentication");
+            throw new Exception(e.getMessage());
         }
     }
 

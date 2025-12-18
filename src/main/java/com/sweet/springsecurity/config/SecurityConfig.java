@@ -10,8 +10,14 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -51,6 +57,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder(); // Mã hóa mật khẩu bằng BCrypt
+
 //        return new SCryptPasswordEncoder( // Mã hóa mật khẩu bằng SCrypt
 //                16384, // cpu Cost
 //                8,     // memory Cost
@@ -58,28 +65,24 @@ public class SecurityConfig {
 //                32,    // key length
 //                32     // salt length
 //        );
-        return new Argon2PasswordEncoder( // Mã hóa mật khẩu bằng Argon2
-                16,     // salt length
-                32,     // hash length
-                1,      // parallelism
-                65536,  // memory (64MB)
-                3       // iterations
-        );
+
+//        return new Argon2PasswordEncoder( // Mã hóa mật khẩu bằng Argon2
+//                16,     // salt length
+//                32,     // hash length
+//                1,      // parallelism
+//                65536,  // memory (64MB)
+//                3       // iterations
+//        );
+
+        String defaultPasswordEncoder = "argon2";
+
+        Map<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
+        encoders.put("scrypt", new SCryptPasswordEncoder( 16384, 8, 1, 32, 32));
+        encoders.put("argon2", new Argon2PasswordEncoder( 16, 32,1, 65536,3));
+
+        DelegatingPasswordEncoder encoder = new DelegatingPasswordEncoder(defaultPasswordEncoder, encoders);
+        encoder.setDefaultPasswordEncoderForMatches(new BCryptPasswordEncoder()); // Đặt encoder mặc định khi không có prefix trong password để nhận biết encoder
+        return encoder;
     }
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user = User.withUsername("user")
-//                .password(passwordEncoder().encode("123"))
-//                .roles("USER") // Người dùng có quyền USER
-//                .build();
-//
-//        UserDetails admin = User.withUsername("admin")
-//                .password(passwordEncoder().encode("123"))
-//                .roles("ADMIN") // Người dùng có quyền ADMIN
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
 }
-

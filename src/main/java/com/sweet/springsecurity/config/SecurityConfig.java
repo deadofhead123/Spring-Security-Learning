@@ -9,8 +9,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -51,12 +51,19 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder(); // Mã hóa mật khẩu bằng BCrypt
-        return new SCryptPasswordEncoder( // Mã hóa mật khẩu bằng SCrypt
-                16384, // cpu Cost
-                8,     // memory Cost
-                1,     // parallelization
-                32,    // key length
-                32     // salt length
+//        return new SCryptPasswordEncoder( // Mã hóa mật khẩu bằng SCrypt
+//                16384, // cpu Cost
+//                8,     // memory Cost
+//                1,     // parallelization
+//                32,    // key length
+//                32     // salt length
+//        );
+        return new Argon2PasswordEncoder( // Mã hóa mật khẩu bằng Argon2
+                16,     // salt length
+                32,     // hash length
+                1,      // parallelism
+                65536,  // memory (64MB)
+                3       // iterations
         );
     }
 
